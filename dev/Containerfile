@@ -1,0 +1,5 @@
+FROM scratch
+COPY --from=rootfs . /
+COPY . /tmp/build/
+
+RUN /tmp/build/setup && rm -rf /tmp/build
