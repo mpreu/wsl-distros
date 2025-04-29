@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Get location of this script.
+wd=$(dirname "$(readlink -f "$0")")
+cd $wd
+
+dnf update -y \
+    && dnf install -y dnf-plugins-core \
+    && dnf config-manager addrepo --from-repofile=https://rpm.releases.hashicorp.com/fedora/hashicorp.repo
+
+dnf install -y git podman packer @virtualization \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf
+
+rpm --restore shadow-utils
+
+cp -R ./rootfs/* /
+
+update-ca-trust

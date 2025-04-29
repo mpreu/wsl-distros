@@ -1,0 +1,9 @@
+[Unit]
+Description=Fix wayland socket link permissions.
+
+[Service]
+ExecStart=sh -c "ln -sfn /mnt/wslg/runtime-dir/wayland-0* "%t
+Type=oneshot
+
+[Install]
+WantedBy=default.target
