@@ -5,11 +5,25 @@ set -euo pipefail
 wd=$(dirname "$(readlink -f "$0")")
 cd $wd
 
+# Create and configure the JFrog CLI repository.
+cat << EOF > /etc/yum.repos.d/jfrog-cli.repo
+[jfrog-cli]
+name=JFrog CLI
+baseurl=https://releases.jfrog.io/artifactory/jfrog-rpms
+enabled=1
+gpgcheck=1
+EOF
+
+# Import GPG keys for verifying packages.
+# Note: Two keys are imported for backward compatibility with older versions.
+rpm --import https://releases.jfrog.io/artifactory/api/v2/repositories/jfrog-rpms/keyPairs/primary/public
+rpm --import https://releases.jfrog.io/artifactory/api/v2/repositories/jfrog-rpms/keyPairs/secondary/public
+
 dnf update -y \
     && dnf install -y dnf-plugins-core \
     && dnf config-manager addrepo --from-repofile=https://rpm.releases.hashicorp.com/fedora/hashicorp.repo
 
-dnf install -y git podman packer @virtualization \
+dnf install -y git podman packer @virtualization ansible sshpass xorriso guestfs-tools jfrog-cli-v2-jf \
     && dnf clean all \
     && rm -rf /var/cache/dnf
 
